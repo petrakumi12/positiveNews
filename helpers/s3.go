@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -22,10 +21,7 @@ const (
 
 // UploadJSONToS3 uploads JSON data to an S3 bucket
 func UploadJSONToS3(ctx context.Context, data interface{}) error {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
-	if err != nil {
-		return fmt.Errorf("failed to load AWS config: %w", err)
-	}
+	cfg, _ := LoadAWSConfigWithRegion(ctx, region)
 
 	s3Client := s3.NewFromConfig(cfg)
 
@@ -52,10 +48,7 @@ func UploadJSONToS3(ctx context.Context, data interface{}) error {
 
 // GeneratePreSignedURL creates a temporary S3 URL for latest_news.json
 func GeneratePreSignedURL(ctx context.Context) (string, error) {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
-	if err != nil {
-		return "", fmt.Errorf("failed to load AWS config: %w", err)
-	}
+	cfg, _ := LoadAWSConfigWithRegion(ctx, region)
 
 	s3Client := s3.NewFromConfig(cfg)
 	psClient := s3.NewPresignClient(s3Client)
@@ -74,11 +67,7 @@ func GeneratePreSignedURL(ctx context.Context) (string, error) {
 
 // UpdateIndexHTML replaces the pre-signed URL inside index.html and uploads the new version to S3
 func UpdateIndexHTML(ctx context.Context, preSignedURL string) error {
-	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(region))
-	if err != nil {
-		return fmt.Errorf("failed to load AWS config: %w", err)
-	}
-
+	cfg, _ := LoadAWSConfigWithRegion(ctx, region)
 	s3Client := s3.NewFromConfig(cfg)
 
 	// Fetch the existing index.html from S3

@@ -7,17 +7,14 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	ddb "github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	ddbTypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
 // getRecentArticleURLs retrieves URLs of articles stored in DynamoDB within the last month.
 func GetRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return nil, err
-	}
+	cfg, _ := LoadAWSConfig(ctx)
+
 	ddbClient := ddb.NewFromConfig(cfg)
 	oneMonthAgo := time.Now().AddDate(0, -1, 0).Format(time.RFC3339)
 	input := &ddb.ScanInput{
@@ -42,10 +39,7 @@ func GetRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
 
 // storeArticles saves the selected articles to DynamoDB.
 func StoreArticles(ctx context.Context, articles []ArticleWithContent) error {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return fmt.Errorf("unable to load AWS config: %w", err)
-	}
+	cfg, _ := LoadAWSConfig(ctx)
 	ddbClient := ddb.NewFromConfig(cfg)
 	expirationTime := time.Now().AddDate(0, 6, 0).Unix() // Unix timestamp (seconds)
 	for _, art := range articles {

@@ -6,16 +6,12 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/config"
 	sm "github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )
 
 // getSecrets retrieves NEWS_API_KEY and OPENAI_API_KEY from AWS Secrets Manager.
 func GetSecrets(ctx context.Context) (newsAPIKey, openaiAPIKey string, err error) {
-	cfg, err := config.LoadDefaultConfig(ctx)
-	if err != nil {
-		return "", "", err
-	}
+	cfg, _ := LoadAWSConfig(ctx)
 	smClient := sm.NewFromConfig(cfg)
 	secretName := "positiveNews_openai_newsapi_keys" // Hardcoded secret name.
 	input := &sm.GetSecretValueInput{

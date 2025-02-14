@@ -126,6 +126,53 @@
     fetchNews();
   </script>
 
+<h2>📩 Subscribe for Daily Positive News!</h2>
+<p>Get uplifting news delivered to your inbox every day.</p>
+
+<label for="name-input">Name:</label>
+<input type="text" id="name-input" placeholder="Enter your name" required><br><br>
+
+<label for="email-input">Email:</label>
+<input type="email" id="email-input" placeholder="Enter your email" required>
+<button onclick="subscribeUser()">Subscribe</button>
+
+<p id="subscription-status"></p>
+
+<script>
+async function subscribeUser() {
+    const name = document.getElementById("name-input").value;
+    const email = document.getElementById("email-input").value;
+    if (!email) {
+        document.getElementById("subscription-status").innerText = "❌ Please enter a valid email.";
+        return;
+    }
+
+    try {
+        // Replace with your Lambda Function URL for subscriptions
+        const lambdaURL = "https://ydsfj2ciebcqtlfj4votvfx2am0hxfem.lambda-url.us-east-2.on.aws/";
+        const payload = { 
+                action: "subscribe", 
+                email: email,
+                name: name 
+            };
+            const response = await fetch(lambdaURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+        const result = await response.json();
+        if (response.ok) {
+            document.getElementById("subscription-status").innerText = result.message;
+        } else {
+            document.getElementById("subscription-status").innerText = `❌ Error: ${result.message}`;
+        }
+    } catch (error) {
+        console.error("Subscription error:", error);
+        document.getElementById("subscription-status").innerText = "❌ Subscription failed. Try again later.";
+    }
+}
+</script>
+
   <footer>Powered by Positivity ✨ | Updated daily</footer>
 </body>
 </html>
