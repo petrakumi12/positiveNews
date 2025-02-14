@@ -70,8 +70,13 @@ func handleRequest(ctx context.Context, event json.RawMessage) error {
 		fmt.Println("Pre-signed URL generated:", preSignedURL)
 	}
 
+	// Update index.html with the new pre-signed URL
+	if err := helpers.UpdateIndexHTML(ctx, preSignedURL); err != nil {
+		fmt.Println("Error updating index.html:", err)
+	}
+
 	// Generate the email message using the updated BuildPlainMessage function
-	plainMessage := helpers.BuildPlainMessage(topArticles, rankedArticles, preSignedURL)
+	plainMessage := helpers.BuildPlainMessage(topArticles, preSignedURL)
 
 	// Send the email with SNS
 	if err := helpers.SendEmailViaSNS(ctx, snsTopicARN, "Your Daily Positive News Rankings", plainMessage); err != nil {

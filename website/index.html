@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feel-Good News</title>
+
+    <!-- Import Lily Script One font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lily+Script+One&display=swap');
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            text-align: center;
+            padding: 20px;
+            color: #fff;
+        }
+        h1 {
+            font-family: 'Lily Script One', cursive;
+            font-size: 2.8em;
+            color: #ffeb3b;
+            text-shadow: 3px 3px 0px #ff5722;
+        }
+        #news-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0;
+        }
+        .news-card {
+            background: #ffffff;
+            color: #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px;
+            width: 320px;
+            text-align: left;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+        .news-card:hover {
+            transform: scale(1.05);
+        }
+        .news-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .news-title {
+            font-family: 'Lily Script One', cursive;
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .news-title a {
+            text-decoration: none;
+            color: #ff5722;
+        }
+        .news-title a:hover {
+            color: #d84315;
+        }
+        .news-excerpt {
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: #666;
+            text-align: center;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌟 Feel-Good News! 🌈</h1>
+    <div id="news-list">Loading...</div>
+
+    <script>
+        async function fetchNews() {
+            try {
+                // Fetch the latest news JSON (replace with your pre-signed URL)
+                const presignedUrl = "https://your-s3-bucket.s3.amazonaws.com/latest_news.json?...signed-url-params";
+                // const presignedUrl = "https://pk-positive-news.s3.us-east-2.amazonaws.com/---"
+
+                const response = await fetch(presignedUrl);
+                const articles = await response.json();
+
+                const newsList = document.getElementById("news-list");
+                newsList.innerHTML = "";
+
+                articles.forEach(article => {
+                    const card = document.createElement("div");
+                    card.classList.add("news-card");
+
+                    // Set default image if none is available
+                    const imageUrl = article.ImageURL ? article.ImageURL : "https://via.placeholder.com/320x180?text=No+Image";
+
+                    card.innerHTML = `
+                        <img src="${imageUrl}" alt="News Image">
+                        <div class="news-title">
+                            <a href="${article.URL}" target="_blank">${article.Title}</a>
+                        </div>
+                        <div class="news-excerpt">${article.Excerpt}</div>
+                    `;
+                    newsList.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Failed to fetch news:", error);
+                document.getElementById("news-list").innerHTML = "<p>Oops! Something went wrong. Try again later.</p>";
+            }
+        }
+
+        fetchNews();
+    </script>
+
+    <footer>Powered by Positivity ✨ | Updated daily</footer>
+</body>
+</html>

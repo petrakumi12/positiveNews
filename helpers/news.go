@@ -32,8 +32,8 @@ func FetchNews(apiKey string, page int) ([]Article, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("NewsAPI Raw Output (page %d):\n", page)
-	fmt.Println(string(body))
+	// fmt.Printf("NewsAPI Raw Output (page %d):\n", page)
+	// fmt.Println(string(body))
 	var newsResp NewsResponse
 	if err := json.Unmarshal(body, &newsResp); err != nil {
 		return nil, err

@@ -70,9 +70,13 @@ This project:
                TopicName: "positive_news"
 
 3. **Build and Test**
+- Build Go Project after major changes
 ```
-GOOS=linux GOARCH=amd64 go build -o main   
-sam local invoke OptimisticNewsFunction --event event.json
+rm go.sum && go clean -cache -modcache -testcache -x  && go mod tidy && go build 
+```
+- Build container and run test using SAM
+```
+GOOS=linux GOARCH=amd64 go build -o main && sam build --cached --use-container && sam build && sam local invoke OptimisticNewsFunction --event event.json
 ```
 
 
@@ -80,6 +84,10 @@ sam local invoke OptimisticNewsFunction --event event.json
 - Build the project
 ```
 GOOS=linux GOARCH=amd64 go build -o main
+```
+- Zip it
+```
+zip sendPositiveNews.zip main
 ```
 - Update through AWS CLI
 ```
@@ -97,3 +105,6 @@ aws lambda update-function-code --function-name sendPositiveNews --zip-file file
     Implement automatic secret rotation using AWS Secrets Manager’s built-in rotation features.
 - Caching:
     Consider caching API responses to reduce the number of external API calls and improve performance.
+- UI changes to improve website look 
+- Subscribtion to different topics
+- Support article photos in website
