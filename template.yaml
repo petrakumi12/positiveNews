@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  OptimisticNewsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      CodeUri: .
+      MemorySize: 512
+      Timeout: 300
+      Environment:
+        Variables:
+          SECRETS_MANAGER_SECRET_NAME: "positiveNews_openai_newsapi_keys"
+      Policies:
+        - SecretsManagerReadWritePolicy:  # Adjust permissions as needed
+            SecretId: "positiveNews_openai_newsapi_keys"
+        - DynamoDBCrudPolicy:
+            TableName: "PositiveArticles"
+        - SNSPublishMessagePolicy:
+            TopicName: "positive_news"
