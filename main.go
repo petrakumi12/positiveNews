@@ -57,15 +57,30 @@ func handleRequest(ctx context.Context, event json.RawMessage) error {
 		fmt.Println("Top articles stored successfully!")
 	}
 
-	// Build and send the SNS email.
-	plainSubject := "Your Daily Positive News Rankings"
-	plainMessage := helpers.BuildPlainMessage(topArticles, rankedArticles)
-	if err := helpers.SendEmailViaSNS(ctx, snsTopicARN, plainSubject, plainMessage); err != nil {
+	// Store as json in S3 for website.
+	if err := helpers.UploadJSONToS3(ctx, topArticles); err != nil {
+		fmt.Println("Error uploading latest news to S3:", err)
+	}
+
+	// Generate pre-signed URL for latest news JSON
+	preSignedURL, err := helpers.GeneratePreSignedURL(ctx)
+	if err != nil {
+		fmt.Println("Error generating pre-signed URL:", err)
+	} else {
+		fmt.Println("Pre-signed URL generated:", preSignedURL)
+	}
+
+	// Generate the email message using the updated BuildPlainMessage function
+	plainMessage := helpers.BuildPlainMessage(topArticles, rankedArticles, preSignedURL)
+
+	// Send the email with SNS
+	if err := helpers.SendEmailViaSNS(ctx, snsTopicARN, "Your Daily Positive News Rankings", plainMessage); err != nil {
 		fmt.Println("Error sending email via SNS:", err)
 		return err
+	} else {
+		fmt.Println("Email sent successfully with pre-signed URL!")
+		return nil
 	}
-	fmt.Println("Email sent successfully via SNS!")
-	return nil
 }
 
 func main() {
