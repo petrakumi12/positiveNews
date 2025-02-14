@@ -10,32 +10,32 @@ This is a serverless Go application that aggregates optimistic news articles, ra
 This project:
 
 - **Fetches News:** Retrieves news articles using the NewsAPI.
-- **Filters Articles:** Filters out articles with fewer than 150 words and those that have been sent in the past month (using DynamoDB).
+- **Filters Articles:** Filters out articles with fewer than 150 words and those that have been sent in the past month.
 - **Ranks Articles:** Uses GPT-4 (via the OpenAI API) to rank articles by positivity.
 - **Stores Articles:** Saves the top articles in a DynamoDB table.
 - **Sends Email:** Sends a plain text email via SNS with the top 10 positive articles.
 - **Runs on Daily Schedule:** Designed to run as a Lambda function, triggered by an EventBridge rule on a daily schedule.
 
 ## Tools Used
-	- **AWS Lambda** – Runs the function on a daily schedule.
-	- **Amazon EventBridge** – Triggers the Lambda function at 7:20 AM PDT.
-	- **AWS Secrets Manager** – Stores API keys securely.
-	- **AWS DynamoDB** – Stores previously sent articles to prevent duplicates.
-	- **AWS SNS** – Sends the top 10 articles via email.
-	- **NewsAPI** – Fetches news articles based on positive keywords.
-	- **OpenAI API** – Ranks articles by positivity.
-	- **Go (Golang)** – Used for efficient and concurrent execution.
-	- **AWS SAM CLI & Docker** – Enables local testing of the Lambda function.
+- **AWS Lambda** – Runs the function on a daily schedule.
+- **Amazon EventBridge** – Triggers the Lambda function at 7:20 AM PDT.
+- **AWS Secrets Manager** – Stores API keys securely.
+- **AWS DynamoDB** – Stores previously sent articles to prevent duplicates.
+- **AWS SNS** – Sends the top 10 articles via email.
+- **NewsAPI** – Fetches news articles based on positive keywords.
+- **OpenAI API** – Ranks articles by positivity.
+- **Go (Golang)** – Used for efficient and concurrent execution.
+- **AWS SAM CLI & Docker** – Enables local testing of the Lambda function.
 
 ## Code Workflow
-	1.	Retrieve Secrets – Fetch API keys from AWS Secrets Manager.
-	2.	Fetch News – Get articles from NewsAPI, handling pagination to avoid duplicates.
-	3.	Filter Articles – Remove articles with <150 words and those recently sent.
-	4.	Extract Content – Download and summarize article body (first 50 words).
-	5.	Rank with GPT-4 – Analyze and rank the top 30 articles.
-	6.	Store in DynamoDB – Save selected articles to prevent resending.
-	7.	Send Email via SNS – Deliver the top 10 articles to subscribers.
-	8.	Schedule Execution – AWS EventBridge triggers this workflow daily.
+1.	Retrieve Secrets – Fetch API keys from AWS Secrets Manager.
+2.	Fetch News – Get articles from NewsAPI, handling pagination to avoid duplicates.
+3.	Filter Articles – Remove articles with <150 words and those recently sent.
+4.	Extract Content – Download and summarize article body (first 50 words).
+5.	Rank with GPT-4 – Analyze and rank the top 30 articles.
+6.	Store in DynamoDB – Save selected articles to prevent resending.
+7.	Send Email via SNS – Deliver the top 10 articles to subscribers.
+8.	Schedule Execution – AWS EventBridge triggers this workflow daily.
 
 
 ## Local Testing Using AWS SAM CLI
