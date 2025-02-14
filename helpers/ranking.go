@@ -1,5 +1,5 @@
 // ranking.go
-package main
+package helpers
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 // rankArticlesWithChatGPT sends up to 30 articles to GPT-4 for ranking.
-func rankArticlesWithChatGPT(ctx context.Context, client *openai.Client, articles []ArticleWithContent) ([]RankedArticle, error) {
+func RankArticlesWithChatGPT(ctx context.Context, client *openai.Client, articles []ArticleWithContent) ([]RankedArticle, error) {
 	if len(articles) > 30 {
 		articles = articles[:30]
 	}
@@ -62,4 +62,22 @@ func rankArticlesWithChatGPT(ctx context.Context, client *openai.Client, article
 		return nil, fmt.Errorf("failed to parse JSON ranking: %v\nRaw output: %s", err, resultText)
 	}
 	return ranked, nil
+}
+
+// selectTopArticles selects up to 10 top articles from the ranked articles.
+func SelectTopArticles(rankedArticles []RankedArticle, validArticles []ArticleWithContent) []ArticleWithContent {
+	articleMap := make(map[string]ArticleWithContent)
+	for _, art := range validArticles {
+		articleMap[art.URL] = art
+	}
+	var topArticles []ArticleWithContent
+	for _, ra := range rankedArticles {
+		if art, ok := articleMap[ra.URL]; ok {
+			topArticles = append(topArticles, art)
+		}
+		if len(topArticles) >= 10 {
+			break
+		}
+	}
+	return topArticles
 }

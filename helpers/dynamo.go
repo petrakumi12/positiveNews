@@ -1,5 +1,5 @@
 // dynamo.go
-package main
+package helpers
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 )
 
 // getRecentArticleURLs retrieves URLs of articles stored in DynamoDB within the last month.
-func getRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
+func GetRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func getRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
 	ddbClient := ddb.NewFromConfig(cfg)
 	oneMonthAgo := time.Now().AddDate(0, -1, 0).Format(time.RFC3339)
 	input := &ddb.ScanInput{
-		TableName:        aws.String(tableName),
+		TableName:        aws.String(TableName),
 		FilterExpression: aws.String("StoredAt >= :date"),
 		ExpressionAttributeValues: map[string]ddbTypes.AttributeValue{
 			":date": &ddbTypes.AttributeValueMemberS{Value: oneMonthAgo},
@@ -41,7 +41,7 @@ func getRecentArticleURLs(ctx context.Context) (map[string]bool, error) {
 }
 
 // storeArticles saves the selected articles to DynamoDB.
-func storeArticles(ctx context.Context, articles []ArticleWithContent) error {
+func StoreArticles(ctx context.Context, articles []ArticleWithContent) error {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to load AWS config: %w", err)
@@ -55,7 +55,7 @@ func storeArticles(ctx context.Context, articles []ArticleWithContent) error {
 			"StoredAt": &ddbTypes.AttributeValueMemberS{Value: time.Now().Format(time.RFC3339)},
 		}
 		input := &ddb.PutItemInput{
-			TableName: aws.String(tableName),
+			TableName: aws.String(TableName),
 			Item:      item,
 		}
 		_, err := ddbClient.PutItem(ctx, input)

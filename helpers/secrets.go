@@ -1,5 +1,5 @@
 // secrets.go
-package main
+package helpers
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 )
 
 // getSecrets retrieves NEWS_API_KEY and OPENAI_API_KEY from AWS Secrets Manager.
-func getSecrets(ctx context.Context) (newsAPIKey, openaiAPIKey string, err error) {
+func GetSecrets(ctx context.Context) (newsAPIKey, openaiAPIKey string, err error) {
 	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return "", "", err

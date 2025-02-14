@@ -1,11 +1,11 @@
 // common.go
-package main
+package helpers
 
 // Shared constants
 const (
-	newsAPIURL           = "https://newsapi.org/v2/everything"
-	tableName            = "PositiveArticles"
-	snsTopicARNHardcoded = "arn:aws:sns:us-east-2:969666470832:positive_news"
+	NewsAPIURL           = "https://newsapi.org/v2/everything"
+	TableName            = "PositiveArticles"
+	SnsTopicARNHardcoded = "arn:aws:sns:us-east-2:969666470832:positive_news"
 )
 
 // Shared type definitions

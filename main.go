@@ -6,28 +6,29 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"positive-news/helpers"
+
 	"github.com/aws/aws-lambda-go/lambda"
 	openai "github.com/sashabaranov/go-openai"
 )
 
 func handleRequest(ctx context.Context, event json.RawMessage) error {
 	// Retrieve API keys from Secrets Manager.
-	newsAPIKey, openaiAPIKey, err := getSecrets(ctx)
+	newsAPIKey, openaiAPIKey, err := helpers.GetSecrets(ctx)
 	if err != nil {
 		fmt.Println("Error retrieving secrets:", err)
 		return err
 	}
-	// Use the hardcoded SNS topic ARN.
-	snsTopicARN := snsTopicARNHardcoded
+	snsTopicARN := helpers.SnsTopicARNHardcoded
 
 	// Retrieve recent article URLs from DynamoDB.
-	recentMap, err := getRecentArticleURLs(ctx)
+	recentMap, err := helpers.GetRecentArticleURLs(ctx)
 	if err != nil {
 		fmt.Println("Error fetching recent articles from DynamoDB:", err)
 	}
 
 	// Accumulate valid articles.
-	validArticles, err := accumulateValidArticles(ctx, newsAPIKey, recentMap)
+	validArticles, err := helpers.AccumulateValidArticles(ctx, newsAPIKey, recentMap)
 	if err != nil {
 		fmt.Println("Error accumulating valid articles:", err)
 		return err
@@ -36,7 +37,7 @@ func handleRequest(ctx context.Context, event json.RawMessage) error {
 
 	// Rank articles using GPT-4.
 	openaiClient := openai.NewClient(openaiAPIKey)
-	rankedArticles, err := rankArticlesWithChatGPT(ctx, openaiClient, validArticles)
+	rankedArticles, err := helpers.RankArticlesWithChatGPT(ctx, openaiClient, validArticles)
 	if err != nil {
 		fmt.Println("Error ranking articles:", err)
 		return err
@@ -47,10 +48,10 @@ func handleRequest(ctx context.Context, event json.RawMessage) error {
 	}
 
 	// Select top articles.
-	topArticles := selectTopArticles(rankedArticles, validArticles)
+	topArticles := helpers.SelectTopArticles(rankedArticles, validArticles)
 
 	// Store top articles in DynamoDB.
-	if err := storeArticles(ctx, topArticles); err != nil {
+	if err := helpers.StoreArticles(ctx, topArticles); err != nil {
 		fmt.Println("Error storing articles in DynamoDB:", err)
 	} else {
 		fmt.Println("Top articles stored successfully!")
@@ -58,8 +59,8 @@ func handleRequest(ctx context.Context, event json.RawMessage) error {
 
 	// Build and send the SNS email.
 	plainSubject := "Your Daily Positive News Rankings"
-	plainMessage := buildPlainMessage(topArticles, rankedArticles)
-	if err := sendEmailViaSNS(ctx, snsTopicARN, plainSubject, plainMessage); err != nil {
+	plainMessage := helpers.BuildPlainMessage(topArticles, rankedArticles)
+	if err := helpers.SendEmailViaSNS(ctx, snsTopicARN, plainSubject, plainMessage); err != nil {
 		fmt.Println("Error sending email via SNS:", err)
 		return err
 	}

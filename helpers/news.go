@@ -1,5 +1,5 @@
 // news.go
-package main
+package helpers
 
 import (
 	"context"
@@ -15,14 +15,14 @@ import (
 )
 
 // fetchNews retrieves up to 50 articles from NewsAPI for a given page.
-func fetchNews(apiKey string, page int) ([]Article, error) {
+func FetchNews(apiKey string, page int) ([]Article, error) {
 	query := "inspiring OR heartwarming OR motivational OR encouraging OR breakthrough OR innovation OR success OR 'good news' OR uplifting OR inspiring -crisis -war -tragedy -disaster -shooting"
 	today := time.Now()
 	sevenDaysAgo := today.AddDate(0, 0, -7)
 	fromDate := sevenDaysAgo.Format("2006-01-02")
 	toDate := today.Format("2006-01-02")
 	requestURL := fmt.Sprintf("%s?q=%s&from=%s&to=%s&sortBy=relevancy&pageSize=50&page=%d&language=en&apiKey=%s",
-		newsAPIURL, url.QueryEscape(query), fromDate, toDate, page, apiKey)
+		NewsAPIURL, url.QueryEscape(query), fromDate, toDate, page, apiKey)
 	resp, err := http.Get(requestURL)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func fetchNews(apiKey string, page int) ([]Article, error) {
 }
 
 // fetchArticleContent downloads the article content from a URL.
-func fetchArticleContent(articleURL string) (string, error) {
+func FetchArticleContent(articleURL string) (string, error) {
 	resp, err := http.Get(articleURL)
 	if err != nil {
 		return "", err
@@ -60,7 +60,7 @@ func fetchArticleContent(articleURL string) (string, error) {
 }
 
 // getFiftyWordExcerpt returns the first 50 words of the given text.
-func getFiftyWordExcerpt(text string) string {
+func GetFiftyWordExcerpt(text string) string {
 	words := strings.Fields(text)
 	if len(words) < 50 {
 		return ""
@@ -69,14 +69,14 @@ func getFiftyWordExcerpt(text string) string {
 }
 
 // accumulateValidArticles fetches and filters articles until up to 30 valid ones are accumulated.
-func accumulateValidArticles(ctx context.Context, apiKey string, recentMap map[string]bool) ([]ArticleWithContent, error) {
+func AccumulateValidArticles(ctx context.Context, apiKey string, recentMap map[string]bool) ([]ArticleWithContent, error) {
 	var validArticles []ArticleWithContent
 	seen := make(map[string]bool)
 	attempts := 0
 	maxAttempts := 3
 	page := 1
 	for len(validArticles) < 30 && attempts < maxAttempts {
-		articles, err := fetchNews(apiKey, page)
+		articles, err := FetchNews(apiKey, page)
 		if err != nil {
 			return nil, err
 		}
@@ -89,7 +89,7 @@ func accumulateValidArticles(ctx context.Context, apiKey string, recentMap map[s
 					continue
 				}
 			}
-			content, err := fetchArticleContent(art.URL)
+			content, err := FetchArticleContent(art.URL)
 			if err != nil {
 				fmt.Printf("Error fetching content for article '%s': %v\n", art.Title, err)
 				continue
@@ -98,7 +98,7 @@ func accumulateValidArticles(ctx context.Context, apiKey string, recentMap map[s
 			if len(words) < 150 {
 				continue
 			}
-			excerpt := getFiftyWordExcerpt(content)
+			excerpt := GetFiftyWordExcerpt(content)
 			if excerpt == "" {
 				continue
 			}
