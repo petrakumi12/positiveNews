@@ -103,9 +103,10 @@ func AccumulateValidArticles(ctx context.Context, apiKey string, recentMap map[s
 				continue
 			}
 			validArticles = append(validArticles, ArticleWithContent{
-				Title:   art.Title,
-				URL:     art.URL,
-				Excerpt: excerpt,
+				Title:    art.Title,
+				URL:      art.URL,
+				Excerpt:  excerpt,
+				ImageURL: art.ImageURL,
 			})
 			seen[art.URL] = true
 			if len(validArticles) >= 30 {

@@ -17,12 +17,14 @@ type Article struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	URL         string `json:"url"`
+	ImageURL    string `json:"urlToImage"`
 }
 
 type ArticleWithContent struct {
-	Title   string
-	URL     string
-	Excerpt string
+	Title    string
+	URL      string
+	Excerpt  string
+	ImageURL string
 }
 
 type RankedArticle struct {

@@ -4,7 +4,7 @@ Resources:
   OptimisticNewsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: main
+      Handler: bootstrap
       Runtime: go1.x
       CodeUri: .
       MemorySize: 512

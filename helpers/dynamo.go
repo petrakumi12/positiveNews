@@ -47,12 +47,14 @@ func StoreArticles(ctx context.Context, articles []ArticleWithContent) error {
 		return fmt.Errorf("unable to load AWS config: %w", err)
 	}
 	ddbClient := ddb.NewFromConfig(cfg)
+	expirationTime := time.Now().AddDate(0, 6, 0).Unix() // Unix timestamp (seconds)
 	for _, art := range articles {
 		item := map[string]ddbTypes.AttributeValue{
 			"url":      &ddbTypes.AttributeValueMemberS{Value: art.URL},
 			"Title":    &ddbTypes.AttributeValueMemberS{Value: art.Title},
 			"Excerpt":  &ddbTypes.AttributeValueMemberS{Value: art.Excerpt},
 			"StoredAt": &ddbTypes.AttributeValueMemberS{Value: time.Now().Format(time.RFC3339)},
+			"TTL":      &ddbTypes.AttributeValueMemberN{Value: fmt.Sprintf("%d", expirationTime)},
 		}
 		input := &ddb.PutItemInput{
 			TableName: aws.String(TableName),

@@ -36,6 +36,7 @@ This project:
 6.	Store in DynamoDB – Save selected articles to prevent resending.
 7.	Send Email via SNS – Deliver the top 10 articles to subscribers.
 8.	Schedule Execution – AWS EventBridge triggers this workflow daily.
+9.  Support subscription - Customers should be able to subscribe in one click
 
 
 ## Local Testing Using AWS SAM CLI
@@ -81,13 +82,12 @@ GOOS=linux GOARCH=amd64 go build -o main && sam build --cached --use-container &
 
 
 ## Deploy to Lambda
-- Build the project
+- Remove old artifacts and rebuild container
 ```
-GOOS=linux GOARCH=amd64 go build -o main
-```
+rm -f main sendPositiveNews.zip && GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bootstrap main.go ```
 - Zip it
 ```
-zip sendPositiveNews.zip main
+zip sendPositiveNews.zip bootstrap
 ```
 - Update through AWS CLI
 ```
