@@ -3,7 +3,10 @@
 # Positive News Aggregator
 A tool that sends a daily email of feel-good news articles. 
 
-This is a serverless Go application that aggregates optimistic news articles, ranks them using GPT-4, stores top articles in DynamoDB, and sends a daily email via SNS with your top 10 positive news articles of the past week.
+This is a serverless Go application that aggregates optimistic news articles, ranks them using GPT-4, stores top articles in DynamoDB, and sends a daily email via SNS with your top 10 positive news articles of the past week. 
+
+Users don't need to subscribe to see the daily feed at this (very unserious) website: http://pk-positive-news.s3-website.us-east-2.amazonaws.com/
+To subscribe, users can scroll to the bottom of the website and submit their Name + Email. 
 
 ## Overview
 
@@ -84,7 +87,8 @@ GOOS=linux GOARCH=amd64 go build -o main && sam build --cached --use-container &
 ## Deploy to Lambda
 - Remove old artifacts and rebuild container
 ```
-rm -f main sendPositiveNews.zip && GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bootstrap main.go ```
+rm -f main sendPositiveNews.zip && GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o bootstrap main.go
+```
 - Zip it
 ```
 zip sendPositiveNews.zip bootstrap
@@ -97,14 +101,9 @@ aws lambda update-function-code --function-name sendPositiveNews --zip-file file
 ## Future Improvements
 - Deduplication Across Sources:
     Enhance the logic to detect duplicate articles from different news sources (e.g., via normalized titles or content hashes).
-- Daily Website Update:
-    Generate and host a daily-updated website (using S3/CloudFront or AWS Amplify) with the full list of articles, and include that link in the email.
 - Enhanced Error Handling & Logging:
     Add more detailed error handling and logging for easier debugging and monitoring.
-- Secret Rotation:
-    Implement automatic secret rotation using AWS Secrets Manager’s built-in rotation features.
 - Caching:
-    Consider caching API responses to reduce the number of external API calls and improve performance.
+     Cache API responses to reduce the number of external API calls and improve performance.
 - UI changes to improve website look 
 - Subscribtion to different topics
-- Support article photos in website
